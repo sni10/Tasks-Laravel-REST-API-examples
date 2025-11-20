@@ -19,7 +19,7 @@ jobs:
 
       - name: Build and start containers
         run: |
-          docker compose -f docker-compose.yml -f docker/config-envs/test/docker-compose.override.yml up -d --build
+          docker compose -f docker-compose.yml -f up -d --build
 
       - name: Wait for MySQL to be ready
         run: |
