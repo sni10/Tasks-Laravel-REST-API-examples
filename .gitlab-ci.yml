@@ -1,0 +1,80 @@
+stages:
+  - test
+#  - build
+#  - deploy
+
+variables:
+  MYSQL_DATABASE: task_management
+  MYSQL_USER: user1
+  MYSQL_PASSWORD: user1
+  MYSQL_ROOT_PASSWORD: root
+  MYSQL_HOST: mysql
+  MYSQL_PORT: 3306
+
+test:
+  stage: test
+  image: php:8.2-fpm
+  services:
+    - name: mysql:8.0.33
+      alias: mysql
+      command: [ "--default-authentication-plugin=mysql_native_password" ]
+    - name: redis:7.0.7
+      alias: redis
+  before_script:
+    - apt-get update && apt-get install -y git unzip curl libpng-dev libonig-dev libxml2-dev zip default-mysql-client
+    - pecl install xdebug && docker-php-ext-enable xdebug
+    - export XDEBUG_MODE=coverage
+    - docker-php-ext-install pdo_mysql
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - cp .env.example .env
+    - cp ./nginx/php.ini /usr/local/etc/php/conf.d/custom-php.ini
+    - cp ./nginx/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+    - composer install --no-interaction --prefer-dist --optimize-autoloader
+    - php artisan key:generate
+  script:
+    - |
+      mysql --host="$MYSQL_HOST" --port="$MYSQL_PORT" --user="root" --password="$MYSQL_ROOT_PASSWORD" -e "\
+      CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE; \
+      GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'%'; \
+      FLUSH PRIVILEGES;"
+    - php artisan migrate
+    - php artisan test
+    - XDEBUG_MODE=coverage ./vendor/bin/phpunit --log-junit storage/coverage-report/phpunit-report.xml --coverage-text --coverage-html=storage/coverage-report --coverage-clover=storage/coverage-report/phpunit-coverage.xml
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+  artifacts:
+    when: always
+    paths:
+      - storage/coverage-report
+    reports:
+      junit: storage/coverage-report/phpunit-report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: storage/coverage-report/phpunit-coverage.xml
+
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+
+#build_and_push:
+#  stage: build
+#  image: docker:stable
+#  services:
+#    - docker:dind
+#  before_script:
+#    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#  script:
+#    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA .
+#    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+#  rules:
+#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#      when: always
+#
+#deploy:
+#  stage: deploy
+#  script:
+#    - echo "Deploying to production..."
+#  rules:
+#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#      when: always

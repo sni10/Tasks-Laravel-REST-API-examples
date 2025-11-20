@@ -1,0 +1,10 @@
+.idea/
+node_modules/
+vendor/
+.env
+dbdata
+*.log
+node_modules
+composer.lock
+npm-debug.log
+.git
