@@ -1,7 +1,12 @@
-# Tiny Laravel To-do Tasks REST/API Backend (pet)
-[![pipeline status](https://gitlab.com/velostour/lara-task-room/badges/main/pipeline.svg)](https://gitlab.com/velostour/lara-task-room/-/commits/main)
-[![coverage report](https://gitlab.com/velostour/lara-task-room/badges/main/coverage.svg)](https://gitlab.com/velostour/lara-task-room/-/commits/main)
-[![Latest Release](https://gitlab.com/velostour/lara-task-room/-/badges/release.svg)](https://gitlab.com/velostour/lara-task-room/-/releases)
+# Laravel Task Management REST API
+
+> **Laravel-based RESTful API for collaborative task and team management with Sanctum authentication**
+
+[![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php)](https://www.php.net/)
+[![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=flat-square&logo=laravel)](https://laravel.com)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
+[![PHPUnit](https://img.shields.io/badge/Tests-PHPUnit-4F5B93?style=flat-square&logo=php)](https://phpunit.de/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
 
 ## Disclaimer
 
@@ -427,20 +432,6 @@ www-data@2999fbe3af46:~$ php artisan test
 </details>
 
 
-## DevOps
-### CI/CD
->[.gitlab-ci.yml](.gitlab-ci.yml) 
-> 
-> Automated content delivery configuration file for Gitlab
-
-
-### Pipelines with Autotests
-
-> https://gitlab.com/velostour/lara-task-room/-/pipelines 
-> 
-> Free access to list tasks, because is it opensource project
-
-
 ## File structure diagram
 
 <details>
@@ -453,7 +444,6 @@ www-data@2999fbe3af46:~$ php artisan test
 ├── .env.example
 ├── .gitattributes
 ├── .gitignore
-├── .gitlab-ci.yml
 ├── .phpunit.result.cache
 ├── Dockerfile
 ├── README.md
