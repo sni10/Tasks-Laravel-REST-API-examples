@@ -1,101 +1,62 @@
 name: Tests
 
 on:
-  push:
-    branches:
-      - main
-      - stage
-      - dev
   pull_request:
     branches:
-      - main
-      - stage
       - dev
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0.33
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: task_management
-          MYSQL_USER: user1
-          MYSQL_PASSWORD: user1
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
-      redis:
-        image: redis:7.0.7
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: pdo, pdo_mysql, mbstring, xml, xdebug
-          coverage: xdebug
-          tools: composer:v2
-
-      - name: Copy environment file
-        run: cp .env.example .env
-
-      - name: Copy PHP configuration
+      - name: Build and start containers
         run: |
-          sudo cp ./nginx/php.ini /etc/php/8.2/cli/conf.d/99-custom.ini
-          sudo cp ./nginx/php-fpm.conf /etc/php/8.2/fpm/pool.d/www.conf || true
+          docker compose -f docker-compose.yml -f docker/config-envs/test/docker-compose.override.yml up -d --build
+
+      - name: Wait for MySQL to be ready
+        run: |
+          timeout 60 bash -c 'until docker compose exec mysql mysqladmin ping -h localhost -uroot -proot --silent; do sleep 2; done'
+
+      - name: Create test database
+        run: |
+          docker compose exec mysql mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS task_management_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
       - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: |
+          docker compose exec -u root php composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Copy environment file
+        run: |
+          docker compose exec php cp .env.example .env
 
       - name: Generate application key
-        run: php artisan key:generate
-
-      - name: Setup database
-        env:
-          MYSQL_HOST: 127.0.0.1
-          MYSQL_PORT: 3306
-          MYSQL_DATABASE: task_management
-          MYSQL_USER: user1
-          MYSQL_PASSWORD: user1
         run: |
-          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS task_management;"
-          mysql -h 127.0.0.1 -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO 'user1'@'%';"
-          mysql -h 127.0.0.1 -u root -proot -e "FLUSH PRIVILEGES;"
+          docker compose exec php php artisan key:generate
 
       - name: Run migrations
-        run: php artisan migrate --force
+        run: |
+          docker compose exec php php artisan migrate:fresh --env=test --force
 
       - name: Run tests
-        run: php artisan test
+        run: |
+          docker compose exec php vendor/bin/phpunit --colors=always
 
       - name: Run PHPUnit with coverage
-        env:
-          XDEBUG_MODE: coverage
         run: |
-          mkdir -p storage/coverage-report
-          ./vendor/bin/phpunit \
+          docker compose exec -e XDEBUG_MODE=coverage php vendor/bin/phpunit \
             --log-junit storage/coverage-report/phpunit-report.xml \
             --coverage-text \
             --coverage-html=storage/coverage-report \
             --coverage-clover=storage/coverage-report/phpunit-coverage.xml
+
+      - name: Copy coverage reports from container
+        if: always()
+        run: |
+          docker compose cp php:/var/www/storage/coverage-report ./storage/
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -112,3 +73,8 @@ jobs:
         with:
           path: storage/coverage-report/phpunit-coverage.xml
           minimum_coverage: 0
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker compose -f docker-compose.yml -f docker/config-envs/test/docker-compose.override.yml down -v

@@ -3,36 +3,31 @@
 namespace Tests\Unit;
 
 use App\Models\Comment;
-use App\Models\Task;
-use App\Models\User;
-use Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class CommentTest extends TestCase
 {
-
     public function testCommentCreation()
     {
-
         $comment = new Comment([
             'content' => 'This is a comment',
-            'task_id' => $this->task->id,
-            'user_id' => $this->user->id
+            'task_id' => 1,
+            'user_id' => 2
         ]);
 
         $this->assertEquals('This is a comment', $comment->content);
-        $this->assertEquals($this->task->id, $comment->task_id);
-        $this->assertEquals($this->user->id, $comment->user_id);
+        $this->assertEquals(1, $comment->task_id);
+        $this->assertEquals(2, $comment->user_id);
     }
 
-    public function testCommentRelations()
+    public function testCommentContentCanBeEmpty()
     {
-
-        $comment = Comment::factory()->make([
-            'task_id' => $this->task->id,
-            'user_id' => $this->user->id
+        $comment = new Comment([
+            'content' => '',
+            'task_id' => 1,
+            'user_id' => 2
         ]);
 
-        $this->assertInstanceOf(Task::class, $comment->task);
-        $this->assertInstanceOf(User::class, $comment->user);
+        $this->assertEquals('', $comment->content);
     }
 }

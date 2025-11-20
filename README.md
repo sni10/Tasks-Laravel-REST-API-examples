@@ -1,6 +1,6 @@
 # Laravel Task Management REST API
 
-> **Laravel-based RESTful API for collaborative task and team management with Sanctum authentication**
+> **REST API на основе Laravel для совместного управления задачами и командами с аутентификацией через Sanctum**
 
 [![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=flat-square&logo=laravel)](https://laravel.com)
@@ -8,95 +8,57 @@
 [![PHPUnit](https://img.shields.io/badge/Tests-PHPUnit-4F5B93?style=flat-square&logo=php)](https://phpunit.de/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
 
-## Disclaimer
+## Environments
 
-### Dockerfile
- 
-[Dockerfile](Dockerfile)
+Проект поддерживает два окружения, управляемых через Docker Compose:
 
-<details>
-  <summary>################################### - EXPAND CODE BLOCK - #####################################</summary>
+### Production environment
+- Использует `docker-compose.yml` как базовую конфигурацию
+- Настроено для боевого развёртывания с оптимизированными параметрами
+- Переменные окружения: `APP_ENV=production`, `APP_DEBUG=false`
+- База данных: `task_management`
 
-```dockerfile
-FROM php:8.2-fpm
+### Development / Testing environment
+- Использует `docker-compose.yml` + `docker/config-envs/test/docker-compose.override.yml`
+- Включает отладку, покрытие кода и подробные сообщения об ошибках
+- Переменные окружения: `APP_ENV=test`, `APP_DEBUG=true`
+- База данных: `task_management_test`
+- Xdebug включён для покрытия и отладки
 
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    procps \
-    net-tools \
-    lsof \
-    libjpeg-dev \
-    libfreetype6-dev \
-    git \
-    curl \
-    && docker-php-ext-install mbstring exif pcntl bcmath gd pdo pdo_mysql zip
+## Running the Application
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-RUN pecl install redis && docker-php-ext-enable redis \
-    && pecl install xdebug && docker-php-ext-enable xdebug
-
-RUN docker-php-ext-install mbstring exif pcntl bcmath gd pdo pdo_mysql zip
-
-#COPY ./nginx/php.ini /usr/local/etc/php/conf.d/custom-php.ini
-#COPY ./nginx/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
-
-COPY . /var/www
-
-WORKDIR /var/www
-
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
-    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
-
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-USER www-data
-
-CMD ["php-fpm"]
-
-```
-</details>
-
-Ready for build.
-
-I've commented out the configurations for running the container locally.
-```yaml
-# COPY ./nginx/php.ini /usr/local/etc/php/conf.d/custom-php.ini
-# COPY ./nginx/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+### Production
+1. Клонируйте репозиторий:
+```bash
+git clone <repository-url>
+cd tasks
 ```
 
-Uncomment them if you need to build an independent image
-```yaml
-COPY ./nginx/php.ini /usr/local/etc/php/conf.d/custom-php.ini
-COPY ./nginx/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+2. Создайте файл `.env.prod` на основе `.env.example` с боевыми настройками
+
+3. Соберите и запустите контейнеры:
+```bash
+docker compose build
+docker compose up -d
 ```
 
-### docker-compose.yml
-[docker-compose.yml](docker-compose.yml)
+4. API будет доступен по адресу `http://localhost:8000`
 
-Oriented towards local deployment, using volumes for that purpose.
-```yaml
-volumes:
-    - .:/var/www # for the ability to locally plug-and-play modify project files for development
-    - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    - ./nginx/snippets/fastcgi-php.conf:/etc/nginx/snippets/fastcgi-php.conf
+### Development / Testing
+1. Создайте `.env.test` или `.env.dev` на основе `.env.example` с параметрами для test/dev
+
+2. Соберите и поднимите окружение с тестовым override:
+```bash
+docker compose --env-file .env.test \
+  -f docker-compose.yml \
+  -f docker/config-envs/test/docker-compose.override.yml build
+
+docker compose --env-file .env.test \
+  -f docker-compose.yml \
+  -f docker/config-envs/test/docker-compose.override.yml up -d
 ```
 
-All the necessary hosts for connecting to containers are specified in the environment files as well as in the Docker configurations. Everything is set to the default settings for simplicity.
-
-## Run app localy
-1. Clone the repository to your local project folder.
-2. Check the volumes and config forwarding. Choose the one you prefer. For more information, see [Disclaimer](#disclaimer).
-3. `docker-compose up --build -d` just use to run App
-
-The application API should work at the address `http://localhost:8000`
-
-`http:\\localhost:8000` By default it is set to the standard Laravel web stub
+3. API будет доступен по адресу `http://localhost:8000`
 
 ## Application composition (Services)
 ```
@@ -137,15 +99,15 @@ Route::prefix('v1')->group(function () {
 });
 ```
 
-## Authentication is based on the Sanctum library
-In the future, it is expected that the logic of use will be expanded with the distribution of rights and
-credentials for issued tokens
+## Authentication (Sanctum)
+В дальнейшем предполагается расширение логики использования с распределением прав и
+полномочий для выдаваемых токенов
 
 ---
 
-### Request example `http://localhost:8000/api/v1/register`
+### Example request `http://localhost:8000/api/v1/register`
 <details>
-  <summary>################################### - EXPAND CODE BLOCK - #####################################</summary>
+  <summary>Показать пример</summary>
 
 ```php
 POST http://localhost:8000/api/v1/register
@@ -176,9 +138,9 @@ Response code: 201 (Created); Time: 4942ms (4 s 942 ms); Content length: 91 byte
 ```
 </details>
 
-### Request example `http://localhost:8000/api/v1/login`
+### Example request `http://localhost:8000/api/v1/login`
 <details>
-  <summary>################################### - EXPAND CODE BLOCK - #####################################</summary>
+  <summary>Показать пример</summary>
 
 ```php
 POST http://localhost:8000/api/v1/login
@@ -209,10 +171,10 @@ Response code: 200 (OK); Time: 4533ms (4 s 533 ms); Content length: 91 bytes (91
 ```
 </details>
 
-### Request example `http://localhost:8000/api/v1/tasks`
+### Example request `http://localhost:8000/api/v1/tasks`
 
 <details>
-  <summary>################################### - EXPAND CODE BLOCK - #####################################</summary>
+  <summary>Показать пример</summary>
 
 ```php
 GET http://localhost:8000/api/v1/tasks
@@ -246,7 +208,7 @@ Response code: 200 (OK); Time: 2151ms (2 s 151 ms); Content length: 201 bytes (2
 ```
 </details>
 
-## Another Examples of requests to a group `api/v1`
+## Other examples of requests for group `api/v1`
 
 ```
 http://localhost:8000/api/v1/tasks/15
@@ -259,18 +221,86 @@ http://localhost:8000/api/v1/teams/78/users/2
 
 ---
 ## Tests
-- Runs inside the php container
-- Login to php container `docker exec -it php /bin/bash`
 
-### UnitTest
-- For run directory `./storage/coverage-report` must be writeable on you local host machine
-- `vendor/bin/phpunit --coverage-text --colors=always --testdox` run tests
-- Open `storage/coverage-report/index.html` for detail analyze reports
+Проект включает полноценное покрытие тестами на базе PHPUnit:
+- **Unit-тесты** (`tests/Unit/`) — быстрые изолированные тесты для моделей и бизнес-логики (без БД)
+- **Feature-тесты** (`tests/Feature/`) — интеграционные тесты для API-эндпоинтов с БД
+
+### Running tests locally
+
+Тесты запускаются внутри контейнера PHP, используя окружение разработки/тестирования.
+
+1. Поднимите тестовое окружение:
+```bash
+docker compose --env-file .env.test -f docker-compose.yml -f docker/config-envs/test/docker-compose.override.yml up -d
+```
+
+2. Создайте тестовую базу данных:
+```bash
+docker compose exec mysql mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS task_management_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
+
+3. Примените миграции для тестовой базы данных:
+```bash
+docker compose exec php php artisan migrate:fresh --env=test
+```
+
+4. Запустите все тесты:
+```bash
+docker compose exec php vendor/bin/phpunit --colors=always --testdox
+```
+
+5. Запустите тесты с покрытием:
+```bash
+docker compose exec php vendor/bin/phpunit --coverage-text --colors=always --testdox
+```
+
+6. Сгенерируйте HTML-отчёт покрытия:
+```bash
+docker compose exec php vendor/bin/phpunit --coverage-html=storage/coverage-report
+```
+
+Откройте `storage/coverage-report/index.html` в браузере, чтобы посмотреть отчёт.
+
+### Running individual tests
+
+Запустить один файл тестов:
+```bash
+docker compose exec php vendor/bin/phpunit tests/Feature/TaskTest.php
+```
+
+Запустить конкретный тестовый метод:
+```bash
+docker compose exec php vendor/bin/phpunit --filter=testStoreTask
+```
+
+Запустить только Unit-тесты:
+```bash
+docker compose exec php vendor/bin/phpunit tests/Unit/
+```
+
+Запустить только Feature-тесты:
+```bash
+docker compose exec php vendor/bin/phpunit tests/Feature/
+```
+
+### CI/CD testing
+
+Тесты автоматически запускаются в GitHub Actions при создании pull request в ветку `dev`. В пайплайне выполняется:
+1. Сборка Docker-контейнеров с тестовой конфигурацией
+2. Подготовка тестовой БД (`task_management_test`)
+3. Применение миграций
+4. Запуск всех тестов с покрытием
+5. Загрузка отчётов покрытия как артефактов
+6. Публикация сводки покрытия в pull request
+
+Полную конфигурацию CI/CD смотрите в `.github/workflows/tests.yml`.
+
 ---
-#### Output example UnitTest
+#### Sample test output
 
 <details>
-  <summary>################################### - EXPAND CODE BLOCK - #####################################</summary>
+  <summary>Показать вывод</summary>
 
 ```shell
 www-data@2999fbe3af46:~$ vendor/bin/phpunit --coverage-text --colors=always --testdox
@@ -373,69 +403,11 @@ App\Services\UserService
 ```
 </details>
 
----
-
-### FeatureTest (E2E)
-- Use `php artisan test` or for run default laravel test handler
-- OR `php artisan test --filter=TaskTest` For run tests partly and pointary
-
-#### Output example FeatureTest
-
-<details>
-  <summary>################################### - EXPAND CODE BLOCK - #####################################</summary>
-
-```shell
-www-data@2999fbe3af46:~$ php artisan test
-
-   PASS  Tests\Unit\CommentTest
-  ✓ comment creation                                                                                                                                                                                                                                     7.09s  
-  ✓ comment relations                                                                                                                                                                                                                                    0.97s  
-
-   PASS  Tests\Unit\TaskTest
-  ✓ task creation                                                                                                                                                                                                                                        0.63s  
-  ✓ task relations                                                                                                                                                                                                                                       0.56s  
-
-   PASS  Tests\Unit\TeamTest
-  ✓ team creation and relations                                                                                                                                                                                                                          0.60s  
-
-   PASS  Tests\Unit\UserTest
-  ✓ user creation                                                                                                                                                                                                                                        0.57s  
-
-   PASS  Tests\Feature\AuthTest
-  ✓ registration                                                                                                                                                                                                                                         1.59s  
-  ✓ login                                                                                                                                                                                                                                                0.73s  
-  ✓ logout                                                                                                                                                                                                                                               0.70s  
-
-   PASS  Tests\Feature\CommentTest
-  ✓ store comment                                                                                                                                                                                                                                        0.72s  
-  ✓ delete comment                                                                                                                                                                                                                                       0.57s  
-
-   PASS  Tests\Feature\TaskTest
-  ✓ store task                                                                                                                                                                                                                                           0.73s  
-  ✓ store and update task                                                                                                                                                                                                                                0.63s  
-  ✓ show task                                                                                                                                                                                                                                            0.57s  
-  ✓ index tasks                                                                                                                                                                                                                                          0.58s  
-  ✓ delete task                                                                                                                                                                                                                                          0.61s  
-
-   PASS  Tests\Feature\TeamTest
-  ✓ store team                                                                                                                                                                                                                                           0.71s  
-  ✓ update team                                                                                                                                                                                                                                          0.61s  
-  ✓ index teams                                                                                                                                                                                                                                          0.58s  
-  ✓ add user to team                                                                                                                                                                                                                                     0.58s  
-  ✓ remove user from team                                                                                                                                                                                                                                0.63s  
-  ✓ show team                                                                                                                                                                                                                                            0.60s  
-  ✓ delete team                                                                                                                                                                                                                                          0.61s  
-
-  Tests:    23 passed (125 assertions)
-  Duration: 23.89s
-```
-</details>
-
 
 ## File structure diagram
 
 <details>
-  <summary>################################### - EXPAND CODE BLOCK - #####################################</summary>
+  <summary>Показать структуру</summary>
 
 ```yaml
 ├── .dockerignore
@@ -577,12 +549,29 @@ www-data@2999fbe3af46:~$ php artisan test
 
 </details>
 
+---
 
-docker tag  0c45412e1e33b64f851762c8aac1b6251ca16b47f7da6aa8f49c894d4c2922ed  sni10per/tasks-php:v1.0.1
+## Git Workflow and Releases
 
-docker tag 478461549dd08b8aa16bb6052c29ee22d895cdc95a8c602d32ea609c1ea75352 sni10per/tasks-php:v1.0.1
+### Branching Strategy
+- `main` — production-ready code
+- `stage` — Staging (pre-production)
+- `dev` — интеграционная ветка разработки
 
-docker push sni10per/tasks-php:v1.0.1
+### Release Process
+1. Фичи разрабатываются в feature-ветках и вливаются в `dev` через pull request
+2. Тесты автоматически запускаются на каждый PR в `dev` (см. `.github/workflows/tests.yml`)
+3. Когда `dev` стабилен, создайте PR из `dev` → `stage`
+4. После валидации `stage` создайте PR из `stage` → `main`
+5. После мержа PR `stage` → `main` автоматически создаётся новый релиз с инкрементом версии (см. `.github/workflows/release.yml`)
 
-php artisan make:middleware RestAuthenticate
+### Automated Release Creation
+- Триггерится при мерже PR из `stage` в `main`
+- Автоматически увеличивается patch-версия (например, v1.0.0 → v1.0.1)
+- Создаётся релиз GitHub с changelog
+- Теги в формате семантического версионирования: `vMAJOR.MINOR.PATCH`
 
+---
+
+## License
+MIT License — see [LICENSE](LICENSE) for details

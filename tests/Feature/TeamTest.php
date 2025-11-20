@@ -20,10 +20,7 @@ class TeamTest extends TestCase
 
     public function testUpdateTeam()
     {
-        $this->testStoreTeam();
-
-        $team = Team::where('name', 'New add Team')->first();
-
+        $team = Team::create(['name' => 'Team to Update']);
         $team->users()->attach($this->user->id, ['created_by' => $this->user->id]);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $this->token])
@@ -46,8 +43,7 @@ class TeamTest extends TestCase
 
     public function testAddUserToTeam()
     {
-        $this->testStoreTeam();
-        $team = Team::where('name', 'New add Team')->first();
+        $team = Team::create(['name' => 'Team for Adding User']);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $this->token])
             ->json('POST', '/api/v1/teams/' . $team->id . '/users', [
@@ -56,25 +52,25 @@ class TeamTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['id', 'name', 'users']);
+        $this->assertDatabaseHas('team_user', ['team_id' => $team->id, 'user_id' => $this->user->id]);
     }
 
     public function testRemoveUserFromTeam()
     {
-        $this->testAddUserToTeam();
-        $team = Team::where('name', 'New add Team')->first();
+        $team = Team::create(['name' => 'Team for Removing User']);
+        $team->users()->attach($this->user->id, ['created_by' => $this->user->id]);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $this->token])
             ->json('DELETE', '/api/v1/teams/' . $team->id . '/users/' . $this->user->id);
 
         $response->assertStatus(204);
-
         $this->assertDatabaseMissing('team_user', ['team_id' => $team->id, 'user_id' => $this->user->id]);
     }
 
     public function testShowTeam()
     {
-        $this->testRemoveUserFromTeam();
-        $team = Team::where('name', 'New add Team')->first();
+        $team = Team::create(['name' => 'Team to Show']);
+        $team->users()->attach($this->user->id, ['created_by' => $this->user->id]);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $this->token])
             ->json('GET', '/api/v1/teams/' . $team->id);
@@ -85,14 +81,13 @@ class TeamTest extends TestCase
 
     public function testDeleteTeam()
     {
-        $this->testShowTeam();
-        $team = Team::where('name', 'New add Team')->first();
+        $team = Team::create(['name' => 'Team to Delete']);
+        $team->users()->attach($this->user->id, ['created_by' => $this->user->id]);
 
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $this->token])
             ->json('DELETE', '/api/v1/teams/' . $team->id);
 
         $response->assertStatus(204);
-
         $this->assertDatabaseMissing('teams', ['id' => $team->id]);
     }
 }

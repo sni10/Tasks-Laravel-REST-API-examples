@@ -5,49 +5,36 @@ services:
         ports:
             - "8000:80"
         volumes:
-            - .:/var/www
             - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
             - ./nginx/snippets/fastcgi-php.conf:/etc/nginx/snippets/fastcgi-php.conf
         networks:
             - laravel
+        depends_on:
+            - php
 
     php:
-#        image: sni10per/tasks-php:1.0.1
         image: tasks-php:latest
-#        Uncomment for local project files uses with docker volumes
         build:
             context: .
             dockerfile: Dockerfile
-
         container_name: php
-
-#        Uncomment for local project files uses with docker volumes
         environment:
-            APP_ENV: local
-            APP_DEBUG: true
+            APP_ENV: production
+            APP_DEBUG: false
             DB_HOST: mysql
             DB_DATABASE: task_management
             DB_USERNAME: root
             DB_PASSWORD: root
-            PHP_IDE_CONFIG: "serverName=local-debug"
-
-#        env_file:
-#            - .env
-
-#        Uncomment for local project files uses with docker volumes
-        volumes:
-            - .:/var/www
-            - ./nginx/php.ini:/usr/local/etc/php/conf.d/custom-php.ini
-            - ./nginx/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf
-
         working_dir: /var/www
         networks:
             - laravel
         expose:
             - 9000
         depends_on:
-            - mysql
-            - redis
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_started
 
     mysql:
         image: mysql:8.0.33
@@ -58,17 +45,22 @@ services:
             MYSQL_PASSWORD: user1
             MYSQL_ROOT_PASSWORD: root
         volumes:
-            - ./dbdata/mysql:/var/lib/mysql
+            - mysql_data:/var/lib/mysql
         ports:
             - "3306:3306"
         networks:
             - laravel
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
 
     redis:
         image: redis:7.0.7
         container_name: redis
         volumes:
-            - ./dbdata/redis:/data
+            - redis_data:/data
         ports:
             - "6379:6379"
         networks:
@@ -79,4 +71,5 @@ networks:
         driver: bridge
 
 volumes:
-    dbdata:
+    mysql_data:
+    redis_data:
