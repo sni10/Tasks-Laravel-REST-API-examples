@@ -8,6 +8,7 @@ services:
         environment:
             APP_ENV: test
             APP_DEBUG: true
+            APP_KEY: ${APP_KEY}
             DB_HOST: mysql
             DB_DATABASE: task_management_test
             DB_USERNAME: root
