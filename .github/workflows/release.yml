@@ -1,20 +1,16 @@
 name: Create Release
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - main
 
 # Осмысленное имя ранa в Actions
 run-name: >-
-  Release: ${{ github.event.pull_request.head.ref }} →
-  ${{ github.event.pull_request.base.ref }}
-  (${{ github.event.pull_request.commits }} commits)
+  Release: push on ${{ github.ref_name }} by ${{ github.actor }} (commit ${{ github.sha }})
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'stage'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -91,11 +87,7 @@ jobs:
           body: |
             ## Changes in this Release
 
-            Merged from `${{ github.event.pull_request.head.ref }}` to `${{ github.event.pull_request.base.ref }}` via PR #${{ github.event.pull_request.number }}
-
-            **Pull Request:** ${{ github.event.pull_request.title }}
-
-            For detailed changes, see the [Pull Request](${{ github.event.pull_request.html_url }})
+            Triggered by push to `${{ github.ref_name }}` (commit `${{ github.sha }}`)
 
             ---
 

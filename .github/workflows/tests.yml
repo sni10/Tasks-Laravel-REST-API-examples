@@ -1,5 +1,8 @@
 name: Tests
 
+run-name: >-
+  Tests: ${{ github.event_name }} on ${{ github.ref_name }} by ${{ github.actor }} (commit ${{ github.sha }})
+
 on:
   pull_request:
     branches:
@@ -9,9 +12,9 @@ on:
 
   push:
     branches:
-      - dev
-      - stage
       - main
+      - feature/*
+      - hotfix/*
 
 jobs:
   test:
