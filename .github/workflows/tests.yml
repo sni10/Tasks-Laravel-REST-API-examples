@@ -66,14 +66,6 @@ jobs:
           path: storage/coverage-report
           retention-days: 30
 
-      - name: Comment coverage on PR
-        if: github.event_name == 'pull_request'
-        uses: 5monkeys/cobertura-action@master
-        continue-on-error: true
-        with:
-          path: storage/coverage-report/phpunit-coverage.xml
-          minimum_coverage: 0
-
       - name: Cleanup
         if: always()
         run: |

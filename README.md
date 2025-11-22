@@ -5,7 +5,9 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=flat-square&logo=laravel)](https://laravel.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
+[![Tests CI](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/workflows/tests.yml/badge.svg)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/workflows/tests.yml)
 [![PHPUnit](https://img.shields.io/badge/Tests-PHPUnit-4F5B93?style=flat-square&logo=php)](https://phpunit.de/)
+[![Coverage](https://img.shields.io/badge/Coverage-PHPUnit%20HTML-informational?style=flat-square)](#tests)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
 
 ## Environments
@@ -288,7 +290,6 @@ docker compose exec php vendor/bin/phpunit tests/Feature/
 3. Применение миграций
 4. Запуск всех тестов с покрытием
 5. Загрузка отчётов покрытия как артефактов
-6. Публикация сводки покрытия в pull request
 
 Полную конфигурацию CI/CD смотрите в `.github/workflows/tests.yml`.
 
