@@ -3,7 +3,9 @@ name: Tests
 on:
   pull_request:
     branches:
-      - dev
+      - dev      # feature → dev
+      - stage    # dev → stage
+      - main     # stage → main
 
 jobs:
   test:
