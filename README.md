@@ -4,8 +4,8 @@
 
 [![Release](https://img.shields.io/github/v/release/sni10/Tasks-Laravel-REST-API-examples?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/releases)
 [![Release Workflow](https://img.shields.io/github/actions/workflow/status/sni10/Tasks-Laravel-REST-API-examples/release.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Release)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/workflows/release.yml)
-[![Tests](https://img.shields.io/github/actions/workflow/status/sni10/Tasks-Laravel-REST-API-examples/tests.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Tests)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/runs/19593853313)
-[![Coverage](https://img.shields.io/badge/Coverage-65%25-brightgreen?style=for-the-badge&logo=codecov&logoColor=white)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/runs/19593853313)
+[![Tests](https://img.shields.io/github/actions/workflow/status/sni10/Tasks-Laravel-REST-API-examples/tests.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Tests)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/badge/Coverage-65%25-brightgreen?style=for-the-badge&logo=codecov&logoColor=white)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/workflows/tests.yml)
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
@@ -18,8 +18,8 @@
 ### Production environment
 - Использует `docker-compose.yml` как базовую конфигурацию
 - Настроено для боевого развёртывания с оптимизированными параметрами
-- Переменные окружения: `APP_ENV=production`, `APP_DEBUG=false`
-- База данных: `task_management_test`
+- Переменные окружения: `APP_ENV=prod`, `APP_DEBUG=false`
+- База данных: `task_management`
 
 ### Development / Testing environment
 - Использует `docker-compose.yml` + `docker/config-envs/test/docker-compose.override.yml`
