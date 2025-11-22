@@ -43,6 +43,5 @@ yarn-error.log
 /.claude/
 test_auth_prod.php
 /.env.test
-
 /examples/
 /.composer/
