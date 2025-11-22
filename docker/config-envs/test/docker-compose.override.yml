@@ -1,0 +1,16 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_ENV: ${APP_ENV}
+    environment:
+      XDEBUG_MODE: ${XDEBUG_MODE}
+#    volumes:
+#      - .:/var/www # for the ability to locally plug-and-play modify project files for development
+
+  mysql:
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}

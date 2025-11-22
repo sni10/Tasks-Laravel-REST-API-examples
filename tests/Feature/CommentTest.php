@@ -25,18 +25,15 @@ class CommentTest extends TestCase
 
     public function testDeleteComment()
     {
-
-        $this->testStoreComment();
-
-        $comment = Comment::firstOrCreate([
-            'content' => 'New additional comment',
+        $comment = Comment::create([
+            'content' => 'Comment to delete',
             'task_id' => $this->task->id,
             'user_id' => $this->user->id,
         ]);
 
-
         $response = $this->withHeaders(['Authorization' => 'Bearer ' . $this->token])
             ->json('DELETE', '/api/v1/comments/' . $comment->id);
         $response->assertStatus(204);
+        $this->assertDatabaseMissing('comments', ['id' => $comment->id]);
     }
 }
