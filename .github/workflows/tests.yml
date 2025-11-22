@@ -41,6 +41,19 @@ jobs:
         run: |
           docker compose -f docker-compose.yml -f docker/config-envs/${APP_ENV}/docker-compose.override.yml up -d
 
+      - name: Wait for PHP container ready
+        run: |
+          echo "Waiting for PHP container (entrypoint runs migrations)..."
+          sleep 10
+          for i in {1..30}; do
+            if docker compose exec -T php php artisan --version >/dev/null 2>&1; then
+              echo "PHP container is ready!"
+              break
+            fi
+            echo "Attempt $i/30..."
+            sleep 2
+          done
+
       - name: Run tests
         run: |
           docker compose exec php vendor/bin/phpunit --colors=always
