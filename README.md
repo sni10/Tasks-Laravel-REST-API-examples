@@ -265,22 +265,22 @@ docker compose --env-file .env.test exec php vendor/bin/phpunit --coverage-html=
 
 Запустить один файл тестов:
 ```bash
-docker compose exec php vendor/bin/phpunit tests/Feature/TaskTest.php
+docker compose --env-file .env.test exec php vendor/bin/phpunit tests/Feature/TaskTest.php
 ```
 
 Запустить конкретный тестовый метод:
 ```bash
-docker compose exec php vendor/bin/phpunit --filter=testStoreTask
+docker compose --env-file .env.test exec php vendor/bin/phpunit --filter=testStoreTask
 ```
 
 Запустить только Unit-тесты:
 ```bash
-docker compose exec php vendor/bin/phpunit tests/Unit/
+docker compose --env-file .env.test exec php vendor/bin/phpunit tests/Unit/
 ```
 
 Запустить только Feature-тесты:
 ```bash
-docker compose exec php vendor/bin/phpunit tests/Feature/
+docker compose --env-file .env.test exec php vendor/bin/phpunit tests/Feature/
 ```
 
 ### CI/CD testing
@@ -293,34 +293,6 @@ docker compose exec php vendor/bin/phpunit tests/Feature/
 5. Загрузка отчётов покрытия как артефактов
 
 Полную конфигурацию CI/CD смотрите в `.github/workflows/tests.yml`.
-
-#### APP_KEY in CI (GitHub Actions)
-- В CI не вызывайте `php artisan key:generate` — это требует записи в `.env` и логи, что часто приводит к `Permission denied` внутри контейнера.
-- Вместо этого прокиньте ключ приложения через секреты GitHub: создайте секрет `APP_KEY` со значением из `php artisan key:generate --show` (формат `base64:...`).
-- Файлы `docker-compose.yml` и `docker/config-envs/test/docker-compose.override.yml` уже ожидают переменную окружения `APP_KEY` и передают её в сервис `php`.
-
-Пример шагов в workflow:
-
-```yaml
-- name: Build & up containers
-  env:
-    APP_KEY: ${{ secrets.APP_KEY }}
-  run: |
-    docker compose -f docker-compose.yml -f docker/config-envs/test/docker-compose.override.yml build
-    docker compose -f docker-compose.yml -f docker/config-envs/test/docker-compose.override.yml up -d
-
-- name: Migrate test schema
-  env:
-    APP_KEY: ${{ secrets.APP_KEY }}
-  run: |
-    docker compose exec -T php php artisan migrate:fresh --env=test
-
-- name: Run tests
-  env:
-    APP_KEY: ${{ secrets.APP_KEY }}
-  run: |
-    docker compose exec -T php vendor/bin/phpunit --coverage-text --colors=always --testdox
-```
 
 ---
 #### Sample test output

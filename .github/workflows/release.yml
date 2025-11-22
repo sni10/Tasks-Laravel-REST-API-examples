@@ -91,8 +91,7 @@ jobs:
           body: |
             ## Changes in this Release
 
-            Merged from `${{ github.event.pull_request.head.ref }}` to `${{ github.event.pull_request.base.ref }}`
-            via PR #${{ github.event.pull_request.number }}
+            Merged from `${{ github.event.pull_request.head.ref }}` to `${{ github.event.pull_request.base.ref }}` via PR #${{ github.event.pull_request.number }}
 
             **Pull Request:** ${{ github.event.pull_request.title }}
 
