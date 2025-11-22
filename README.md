@@ -294,11 +294,6 @@ docker compose --env-file .env.test exec php vendor/bin/phpunit tests/Feature/
 
 Полную конфигурацию CI/CD смотрите в `.github/workflows/tests.yml`.
 
-#### APP_KEY in CI (GitHub Actions)
-- В CI не вызывайте `php artisan key:generate` — это требует записи в `.env` и логи, что часто приводит к `Permission denied` внутри контейнера.
-- Вместо этого прокиньте ключ приложения через секреты GitHub: создайте секрет `APP_KEY` со значением из `php artisan key:generate --show` (формат `base64:...`).
-- Файлы `docker-compose.yml` и `docker/config-envs/test/docker-compose.override.yml` уже ожидают переменную окружения `APP_KEY` и передают её в сервис `php`.
-
 ---
 #### Sample test output
 
