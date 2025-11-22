@@ -45,3 +45,4 @@ test_auth_prod.php
 /.env.test
 /examples/
 /.composer/
+ARCHITECTURE_ANALYSIS.md
