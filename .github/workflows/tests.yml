@@ -12,8 +12,9 @@ on:
 
   push:
     branches:
-      - dev
       - main
+      - feature/*
+      - hotfix/*
 
 jobs:
   test:
