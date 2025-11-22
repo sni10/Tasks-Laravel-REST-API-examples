@@ -16,7 +16,7 @@
 - Использует `docker-compose.yml` как базовую конфигурацию
 - Настроено для боевого развёртывания с оптимизированными параметрами
 - Переменные окружения: `APP_ENV=production`, `APP_DEBUG=false`
-- База данных: `task_management`
+- База данных: `task_management_test`
 
 ### Development / Testing environment
 - Использует `docker-compose.yml` + `docker/config-envs/test/docker-compose.override.yml`

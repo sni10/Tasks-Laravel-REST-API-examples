@@ -12,7 +12,7 @@
 - Сборка и запуск: "docker compose build php" затем "docker compose up -d".
 - Установка зависимостей внутри контейнера php: "docker compose exec php bash -lc \"composer install --no-interaction --prefer-dist --optimize-autoloader\"".
 - Генерация ключа приложения: "docker compose exec php php artisan key:generate".
-- База данных по умолчанию: DB_HOST=mysql, DB_DATABASE=task_management, DB_USERNAME=root, DB_PASSWORD=root (см. docker-compose.yml). Проверьте .env при необходимости.
+- База данных по умолчанию: DB_HOST=mysql, DB_DATABASE=task_management_test, DB_USERNAME=root, DB_PASSWORD=root (см. docker-compose.yml). Проверьте .env при необходимости.
 - Миграции для dev: "docker compose exec php php artisan migrate --force". Сиды опционально: "docker compose exec php php artisan db:seed".
 
 3) Тестирование
