@@ -26,10 +26,9 @@ class TaskTest extends TestCase
 
     public function testStoreAndUpdateTask()
     {
-        $this->testStoreTask();
-        $task = Task::firstOrCreate([
-            'title' => 'New additional Task',
-            'description' => 'Details of new task',
+        $task = Task::create([
+            'title' => 'Task to Update',
+            'description' => 'Original description',
             'status' => 'pending',
             'user_id' => $this->user->id,
             'team_id' => $this->team->id
