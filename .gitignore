@@ -41,6 +41,7 @@ yarn-error.log
 /config/sftp_config.json
 /propose/
 /.claude/
+/.junie/
 test_auth_prod.php
 /.env.test
 /examples/
