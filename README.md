@@ -49,13 +49,9 @@ docker compose up -d
 
 2. Соберите и поднимите окружение с тестовым override:
 ```bash
-docker compose --env-file .env.test \
-  -f docker-compose.yml \
-  -f docker/config-envs/test/docker-compose.override.yml build
+docker compose --env-file .env.test -f docker-compose.yml -f docker/config-envs/test/docker-compose.override.yml build
 
-docker compose --env-file .env.test \
-  -f docker-compose.yml \
-  -f docker/config-envs/test/docker-compose.override.yml up -d
+docker compose --env-file .env.test -f docker-compose.yml -f docker/config-envs/test/docker-compose.override.yml up -d
 ```
 
 3. API будет доступен по адресу `http://localhost:8000`
@@ -237,27 +233,27 @@ docker compose --env-file .env.test -f docker-compose.yml -f docker/config-envs/
 
 2. Создайте тестовую базу данных:
 ```bash
-docker compose exec mysql mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS task_management_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+docker compose --env-file .env.test exec mysql mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS task_management_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 ```
 
 3. Примените миграции для тестовой базы данных:
 ```bash
-docker compose exec php php artisan migrate:fresh --env=test
+docker compose --env-file .env.test exec php php artisan migrate:fresh --env=test
 ```
 
 4. Запустите все тесты:
 ```bash
-docker compose exec php vendor/bin/phpunit --colors=always --testdox
+docker compose --env-file .env.test exec php vendor/bin/phpunit --colors=always --testdox
 ```
 
 5. Запустите тесты с покрытием:
 ```bash
-docker compose exec php vendor/bin/phpunit --coverage-text --colors=always --testdox
+docker compose --env-file .env.test exec php vendor/bin/phpunit --coverage-text --colors=always --testdox
 ```
 
 6. Сгенерируйте HTML-отчёт покрытия:
 ```bash
-docker compose exec php vendor/bin/phpunit --coverage-html=storage/coverage-report
+docker compose --env-file .env.test exec php vendor/bin/phpunit --coverage-html=storage/coverage-report
 ```
 
 Откройте `storage/coverage-report/index.html` в браузере, чтобы посмотреть отчёт.

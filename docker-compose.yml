@@ -5,8 +5,8 @@ services:
         ports:
             - "8000:80"
         volumes:
-            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-            - ./nginx/snippets/fastcgi-php.conf:/etc/nginx/snippets/fastcgi-php.conf
+            - ./docker/nginx/${APP_ENV}/default.conf:/etc/nginx/conf.d/default.conf
+            - ./docker/nginx/${APP_ENV}/snippets/fastcgi-php.conf:/etc/nginx/snippets/fastcgi-php.conf
         networks:
             - laravel
         depends_on:
@@ -17,16 +17,10 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
+            args:
+                APP_ENV: ${APP_ENV}
         container_name: php
-        environment:
-            APP_ENV: production
-            APP_DEBUG: false
-            APP_KEY: ${APP_KEY}
-            DB_HOST: mysql
-            DB_DATABASE: task_management
-            DB_USERNAME: root
-            DB_PASSWORD: root
-        working_dir: /var/www
+
         networks:
             - laravel
         expose:
@@ -41,10 +35,8 @@ services:
         image: mysql:8.0.33
         container_name: mysql
         environment:
-            MYSQL_DATABASE: task_management
-            MYSQL_USER: user1
-            MYSQL_PASSWORD: user1
-            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
         volumes:
             - mysql_data:/var/lib/mysql
         ports:
@@ -52,7 +44,7 @@ services:
         networks:
             - laravel
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD}"]
             interval: 10s
             timeout: 5s
             retries: 3

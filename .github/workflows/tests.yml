@@ -17,29 +17,29 @@ jobs:
         run: |
           cp .env.example .env
 
-      - name: Build and start containers
+      - name: Load environment variables
         run: |
-          docker compose -f docker-compose.yml -f up -d --build
+          cat .env >> $GITHUB_ENV
 
-      - name: Wait for MySQL to be ready
-        run: |
-          timeout 60 bash -c 'until docker compose exec mysql mysqladmin ping -h localhost -uroot -proot --silent; do sleep 2; done'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Create test database
-        run: |
-          docker compose exec mysql mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS task_management_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+      - name: Build PHP image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: tasks-php:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            APP_ENV=${{ env.APP_ENV }}
 
-      - name: Install dependencies
+      - name: Start containers
         run: |
-          docker compose exec -u root php composer install --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Generate application key
-        run: |
-          docker compose exec php php artisan key:generate
-
-      - name: Run migrations
-        run: |
-          docker compose exec php php artisan migrate:fresh --env=test --force
+          docker compose -f docker-compose.yml -f docker/config-envs/${APP_ENV}/docker-compose.override.yml up -d
 
       - name: Run tests
         run: |
@@ -47,7 +47,7 @@ jobs:
 
       - name: Run PHPUnit with coverage
         run: |
-          docker compose exec -e XDEBUG_MODE=coverage php vendor/bin/phpunit \
+          docker compose exec -e XDEBUG_MODE=${XDEBUG_MODE} php vendor/bin/phpunit \
             --log-junit storage/coverage-report/phpunit-report.xml \
             --coverage-text \
             --coverage-html=storage/coverage-report \
@@ -77,4 +77,4 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          docker compose -f docker-compose.yml -f docker/config-envs/test/docker-compose.override.yml down -v
+          docker compose -f docker-compose.yml -f docker/config-envs/${APP_ENV}/docker-compose.override.yml down -v

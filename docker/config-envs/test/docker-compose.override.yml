@@ -1,23 +1,14 @@
 services:
-    php:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            args:
-                BUILD_ENV: test
-        environment:
-            APP_ENV: test
-            APP_DEBUG: true
-            APP_KEY: ${APP_KEY}
-            DB_HOST: mysql
-            DB_DATABASE: task_management_test
-            DB_USERNAME: root
-            DB_PASSWORD: root
-            XDEBUG_MODE: coverage
-        volumes:
-          - .:/var/www # for the ability to locally plug-and-play modify project files for development
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_ENV: ${APP_ENV}
+#    volumes:
+#      - .:/var/www # for the ability to locally plug-and-play modify project files for development
 
-    mysql:
-        environment:
-            MYSQL_DATABASE: task_management_test
-            MYSQL_ROOT_PASSWORD: root
+  mysql:
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
