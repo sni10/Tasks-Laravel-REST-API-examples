@@ -10,8 +10,8 @@ class AuthTest extends TestCase
     public function testRegistration()
     {
         $response = $this->json('POST', '/api/v1/register', [
-            'name' => 'Test User copy',
-            'email' => 'test@copy.com',
+            'name' => 'New User',
+            'email' => 'newuser@example.com',
             'password' => 'password123'
         ]);
 
@@ -21,10 +21,14 @@ class AuthTest extends TestCase
 
     public function testLogin()
     {
-        $this->testRegistration();
+        User::create([
+            'name' => 'Login User',
+            'email' => 'loginuser@example.com',
+            'password' => bcrypt('password123')
+        ]);
 
         $response = $this->json('POST', '/api/v1/login', [
-            'email' => 'test@copy.com',
+            'email' => 'loginuser@example.com',
             'password' => 'password123'
         ]);
 
@@ -34,12 +38,9 @@ class AuthTest extends TestCase
 
     public function testLogout()
     {
-        $this->testLogin();
-
-        $user = User::firstOrCreate([
-            'email' => 'test@copy.com'
-        ], [
-            'name' => 'Test User copy',
+        $user = User::create([
+            'name' => 'Logout User',
+            'email' => 'logoutuser@example.com',
             'password' => bcrypt('password123')
         ]);
 
