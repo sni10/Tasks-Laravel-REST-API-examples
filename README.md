@@ -2,13 +2,14 @@
 
 > **REST API на основе Laravel для совместного управления задачами и командами с аутентификацией через Sanctum**
 
-[![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=flat-square&logo=php)](https://www.php.net/)
-[![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=flat-square&logo=laravel)](https://laravel.com)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
-[![Tests CI](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/workflows/tests.yml/badge.svg)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/workflows/tests.yml)
-[![PHPUnit](https://img.shields.io/badge/Tests-PHPUnit-4F5B93?style=flat-square&logo=php)](https://phpunit.de/)
-[![Coverage](https://img.shields.io/badge/Coverage-PHPUnit%20HTML-informational?style=flat-square)](#tests)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
+[![Release](https://img.shields.io/github/v/release/sni10/Tasks-Laravel-REST-API-examples?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/releases)
+[![Release Workflow](https://img.shields.io/github/actions/workflow/status/sni10/Tasks-Laravel-REST-API-examples/release.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Release)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/workflows/release.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/sni10/Tasks-Laravel-REST-API-examples/tests.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Tests)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/badge/Coverage-65%25-brightgreen?style=for-the-badge&logo=codecov&logoColor=white)](https://github.com/sni10/Tasks-Laravel-REST-API-examples/actions/workflows/tests.yml)
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+[![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 ## Environments
 
@@ -17,8 +18,8 @@
 ### Production environment
 - Использует `docker-compose.yml` как базовую конфигурацию
 - Настроено для боевого развёртывания с оптимизированными параметрами
-- Переменные окружения: `APP_ENV=production`, `APP_DEBUG=false`
-- База данных: `task_management_test`
+- Переменные окружения: `APP_ENV=prod`, `APP_DEBUG=false`
+- База данных: `task_management`
 
 ### Development / Testing environment
 - Использует `docker-compose.yml` + `docker/config-envs/test/docker-compose.override.yml`
